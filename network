@@ -1,0 +1,43 @@
+
+
+cd /etc/net/ifaces
+ls
+cp –r enp0s3/ /etc/net/iface/enp0s8
+cp –r enp0s3/ /etc/net/iface/enp0s9
+ls
+cd enp0s8
+nano options
+______
+DISABLED=no
+TYPE=eth
+BOOTPROTO=static
+CONFIG_IPV4=yes
+________
+Ctrl +O Ctrl+X
+nano ipv4address
+______
+192.168.100.62/26
+_____
+Ctrl +O Ctrl+X
+
+nano ipv4route
+______
+default via 192.168.100.1
+_____
+Ctrl +O Ctrl+X
+systemctl restart network
+
+Установка firewalld:
+apt-get update
+apt-get -y install firewalld
+systemctl enable --now firewalld
+Правила к исходящим пакетам (в сторону провайдера):
+firewall-cmd --permanent --zone=public --add-interface=enp0s3
+Правила к входящим пакетам (к локальной сети):
+firewall-cmd --permanent --zone=trusted --add-interface=enp0s8
+firewall-cmd --permanent --zone=trusted --add-interface=enp0s9
+Включение NAT:
+firewall-cmd --permanent --zone=public --add-masquerade
+Сохранение правил:
+firewall-cmd --complete-reload
+
